@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "corsar-wallet"
+version = "0.1.0"
+description = ""
+authors = ["Ivan Piankov <vanypyankov@gmail.com>"]
+readme = "README.md"
+packages = [{include = "corsar_wallet"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.89.1"
+alembic = "^1.9.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
