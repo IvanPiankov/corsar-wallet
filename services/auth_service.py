@@ -9,8 +9,10 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 
 from infrastructure.repositories.users_repository import UserRepository
-from models.auth import UserAuthIn, User, Tokens, UserOut
+from models.auth import UserAuthIn, User, Tokens, UserInternal
 from settings import Settings
+from utils.exceptions.user_exception import UserNotFound, InvalidPassword, NotUniqLogin, NotUniqEmail
+
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth_schema = OAuth2PasswordBearer(
@@ -27,7 +29,7 @@ class AuthService:
     def __init__(self, users_repo: UserRepository) -> None:
         self._users_repo = users_repo
 
-    async def get_user_by_id(self, user_id: UUID) -> User:
+    async def get_user_by_id(self, user_id: UUID) -> UserInternal:
         return await self._users_repo.get_user_by_id(user_id)
 
     @staticmethod
@@ -50,10 +52,14 @@ class AuthService:
         encoded_jwt = jwt.encode(to_encode, Settings.JWT_REFRESH_SECRET_KEY, Settings.ALGORITHM)
         return encoded_jwt
 
-    async def sign_up(self, user_auth: UserAuthIn) -> UserOut:
+    async def sign_up(self, user_auth: UserAuthIn) -> UserInternal:
+        check_uniq_login_email = asyncio.gather(self._users_repo.check_uniq_login(user_auth.login),
+                                                self._users_repo.check_uniq_email(user_auth.email)
+                                                )
         try:
-            await self._users_repo.check_uniq_email_login(user_auth.email, user_auth.login)
-        except Exception as e:
+            await check_uniq_login_email
+        except (NotUniqLogin, NotUniqEmail) as e:
+            check_uniq_login_email.cancel()
             raise e
         user = User(
             user_id=uuid4(),
@@ -62,14 +68,13 @@ class AuthService:
             hashed_password=get_hashed_password(user_auth.password_1),
             wallet_currency=None
         )
-        # TODO: Переделать и собирать в репо
         user_from_db = await self._users_repo.create_user(user)
-        return UserOut.from_dict(user_from_db.to_dict())
+        return UserInternal.from_dict(user_from_db.to_dict())
 
     async def login(self, username: str, password: str) -> Tokens:
         user = await self._users_repo.get_user_by_login(username)
         if not self.verify_password(password, user.hashed_password):
-            raise ValueError
+            raise InvalidPassword
         else:
             access_token, refresh_token = await asyncio.gather(
                 self.create_access_token(user.user_id, Settings.ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -78,13 +83,13 @@ class AuthService:
         return Tokens(access_token, refresh_token)
 
 
-async def get_current_user(token: str = Depends(oauth_schema)):
+async def get_current_user(token: str = Depends(oauth_schema)) -> UserInternal:
     try:
         payload = jwt.decode(token, Settings.JWT_SECRET_KEY, algorithms=[Settings.ALGORITHM])
         user_id = payload.get("sub")
         if user_id is None:
-            raise ValueError
+            raise UserNotFound
         user_id = UUID(user_id)
-    except JWTError:
-        raise ValueError
-    return inject.instance(AuthService).get_user_by_id(user_id)
+    except JWTError as e:
+        raise e
+    return await inject.instance(AuthService).get_user_by_id(user_id)

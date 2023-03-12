@@ -3,17 +3,17 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import ORJSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from models.auth import UserOut, UserAuthIn, Tokens
-from services.auth_service import AuthService
+from models.auth import UserInternal, UserAuthIn, Tokens
+from services.auth_service import AuthService, get_current_user
 
-auth_router = APIRouter(prefix="/system", tags=["System Route"])
+auth_router = APIRouter(tags=["Auth User Route"])
 
 
 def new_auth_service() -> AuthService:
     return inject.instance(AuthService)
 
 
-@auth_router.post("/sign-up", summary="Create new user", response_model=UserOut)
+@auth_router.post("/sign-up", summary="Create new user", response_model=UserInternal)
 async def sign_up(
         user_auth_in: UserAuthIn,
         service: AuthService = Depends(new_auth_service)
@@ -30,3 +30,9 @@ async def login(
     tokens = await service.login(form_data.username, form_data.password)
     return ORJSONResponse(tokens.to_dict())
 
+
+@auth_router.get("/get-me", summary="Get current user", response_model=UserInternal)
+async def login(
+        current_user: UserInternal = Depends(get_current_user)
+):
+    return ORJSONResponse(current_user.to_dict())

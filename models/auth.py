@@ -21,7 +21,7 @@ class UserAuthIn(BaseModel):
 
 
 @dataclass
-class UserOut(DataClassDictMixin):
+class UserInternal(DataClassDictMixin):
     user_id: UUID
     login: str
     email: str
@@ -30,7 +30,7 @@ class UserOut(DataClassDictMixin):
 
 
 @dataclass
-class User(UserOut):
+class User(UserInternal):
     hashed_password: str
 
 

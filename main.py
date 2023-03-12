@@ -9,8 +9,10 @@ from routers.system_routes import system_router
 from routers.users import auth_router
 from services.auth_service import AuthService
 from settings import Settings
+from utils.exception_handler import set_custom_exception
 
 app = FastAPI()
+set_custom_exception(app)
 app.include_router(system_router)
 app.include_router(auth_router)
 
