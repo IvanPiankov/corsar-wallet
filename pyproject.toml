@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "corsar_wallet"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "3.10.6"
 fastapi = "^0.89.1"
 alembic = "^1.9.2"
 environs = "^9.5.0"
@@ -16,6 +16,15 @@ uvicorn = "^0.20.0"
 orjson = "^3.8.5"
 sqlalchemy = "^2.0.0"
 sqlalchemy2-stubs = "^0.0.2a32"
+fastapi-jwt-auth = "^0.5.0"
+passlib = "^1.7.4"
+jose = "^1.0.0"
+mashumaro = "^3.5"
+psycopg2-binary = "^2.9.5"
+pydantic = {extras = ["email"], version = "^1.10.6"}
+python-jose = "^3.3.0"
+python-multipart = "^0.0.6"
+asyncpg = "^0.27.0"
 
 
 [build-system]

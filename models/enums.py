@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class WalletTypes(Enum, str):
+class AccountTypes(str, Enum):
     CASH = "cash"
     CARD = "card"
     SAVINGS_ACCOUNT = "savings_account"
