@@ -25,13 +25,13 @@ def config(binder: inject.Binder):
     global engine
 
     engine = create_async_engine(
-        Settings.get_pg_url(),
-        echo=True
+        Settings.get_pg_url()
     )
 
     user_repo = UserRepository(engine)
     auth_service = AuthService(user_repo)
 
+    binder.bind(UserRepository, user_repo)
     binder.bind(AuthService, auth_service)
 
 

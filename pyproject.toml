@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Ivan Piankov <vanypyankov@gmail.com>"]
 readme = "README.md"
-packages = [{include = "corsar_wallet"}]
+packages = []
 
 [tool.poetry.dependencies]
 python = "3.10.6"

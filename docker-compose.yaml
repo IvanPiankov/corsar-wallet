@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  pg:
+    image: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=corsar-wallet-local-test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready"]
+      interval: 7s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+
+  corsar-wallet:
+    build: .
+    command: bash -c "poetry run alembic upgrade head && poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      pg:
+        condition: service_healthy
+    networks:
+      - app_network
+
+volumes:
+  db-data:
+
+networks:
+  app_network:
