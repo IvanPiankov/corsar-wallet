@@ -24,7 +24,7 @@ class UserRepository:
         )
 
     @staticmethod
-    def _build_internal_user(item: Row) -> User:
+    def _build_internal_user(item: Row) -> UserInternal:
         return UserInternal(
             user_id=UUID(int=item.user_id.int),
             login=item.login,

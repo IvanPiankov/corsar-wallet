@@ -61,8 +61,7 @@ class AuthService:
             user_id=uuid4(),
             login=user_auth.login,
             email=user_auth.email,
-            hashed_password=get_hashed_password(user_auth.password_1),
-            wallet_currency=None,
+            hashed_password=get_hashed_password(user_auth.password_1)
         )
         user_from_db = await self._users_repo.create_user(user)
         return UserInternal.from_dict(user_from_db.to_dict())

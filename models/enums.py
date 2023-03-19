@@ -6,3 +6,9 @@ class AccountTypes(str, Enum):
     CARD = "card"
     SAVINGS_ACCOUNT = "savings_account"
     DEPOSIT_ACCOUNT = "deposit_account"
+
+
+class Currency(str, Enum):
+    USD = "USD"
+    RUB = "RUB"
+    EUR = "EUR"

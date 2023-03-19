@@ -1,9 +1,9 @@
-from dataclasses import field
-from uuid import UUID, uuid4
-
+from uuid import UUID
 from mashumaro import DataClassDictMixin
 from pydantic import BaseModel, EmailStr, validator
-from pydantic.dataclasses import dataclass
+from dataclasses import dataclass
+
+from models.enums import Currency
 
 
 class UserAuthIn(BaseModel):
@@ -20,16 +20,15 @@ class UserAuthIn(BaseModel):
         return v
 
 
-@dataclass
+@dataclass(kw_only=True)
 class UserInternal(DataClassDictMixin):
     user_id: UUID
     login: str
     email: str
-    # TODO: Create wallet_currency if none
-    wallet_currency: str | None
+    wallet_currency: str = Currency.USD
 
 
-@dataclass
+@dataclass(kw_only=True)
 class User(UserInternal):
     hashed_password: str
 
