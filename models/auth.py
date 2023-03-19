@@ -13,10 +13,10 @@ class UserAuthIn(BaseModel):
     password_1: str
     password_2: str
 
-    @validator('password_2')
+    @validator("password_2")
     def passwords_match(cls, v, values, **kwargs):
-        if 'password_1' in values and v != values['password_1']:
-            raise ValueError('Passwords do not match')
+        if "password_1" in values and v != values["password_1"]:
+            raise ValueError("Passwords do not match")
         return v
 
 

@@ -2,8 +2,8 @@ import logging
 
 import inject
 from fastapi import FastAPI
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from infrastructure.repositories.users_repository import UserRepository
 from routers.system_routes import system_router
@@ -17,20 +17,16 @@ set_custom_exception(app)
 app.include_router(system_router)
 app.include_router(auth_router)
 
-origins = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://localhost"
-]
+# TODO: Придумать, что с ними делать.
+origins = ["http://localhost:3000", "http://localhost:8000", "http://localhost"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 
 engine: AsyncEngine | None = None
@@ -40,9 +36,7 @@ def config(binder: inject.Binder):
     global engine
     global engine
 
-    engine = create_async_engine(
-        Settings.get_pg_url()
-    )
+    engine = create_async_engine(Settings.get_pg_url())
 
     user_repo = UserRepository(engine)
     auth_service = AuthService(user_repo)

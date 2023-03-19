@@ -1,18 +1,15 @@
 from uuid import UUID
 
+from sqlalchemy.engine import Row
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from infrastructure.repositories.db_models import users
 from models.auth import User, UserInternal
-
-from sqlalchemy.engine import Row
-
 from utils.custom_exception import InternalException
-from utils.exceptions.user_exception import NotUniqLogin, NotUniqEmail, UserNotFound
+from utils.exceptions.user_exception import NotUniqEmail, NotUniqLogin, UserNotFound
 
 
 class UserRepository:
-
     def __init__(self, db: AsyncEngine):
         self._db = db
 
@@ -23,7 +20,7 @@ class UserRepository:
             login=item.login,
             email=item.email,
             wallet_currency=item.wallet_currency if item.wallet_currency else None,
-            hashed_password=item.hashed_password
+            hashed_password=item.hashed_password,
         )
 
     @staticmethod

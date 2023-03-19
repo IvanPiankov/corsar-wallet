@@ -1,5 +1,5 @@
-from sqlalchemy import MetaData, Table, Column, DECIMAL, String, text, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, ENUM
+from sqlalchemy import DECIMAL, Column, DateTime, ForeignKey, MetaData, String, Table, text
+from sqlalchemy.dialects.postgresql import ENUM, UUID
 
 from models.enums import AccountTypes
 
@@ -24,5 +24,5 @@ users = Table(
     Column("login", String, nullable=False, unique=True),
     Column("email", String, nullable=False, unique=True),
     Column("hashed_password", String, nullable=False),
-    Column("wallet_currency", String, nullable=True)
+    Column("wallet_currency", String, nullable=True),
 )

@@ -20,8 +20,8 @@ class Settings:
     ACCESS_TOKEN_EXPIRE_MINUTES = SECONDS_IN_MINUTES * 30
     REFRESH_TOKEN_EXPIRE_MINUTES = SECONDS_IN_DAY * 7
     ALGORITHM = "HS256"
-    JWT_SECRET_KEY = env.str('JWT_SECRET_KEY')  # jwk secret for generate jwt
-    JWT_REFRESH_SECRET_KEY = env.str('JWT_REFRESH_SECRET_KEY')  # jkk for refresh token
+    JWT_SECRET_KEY = env.str("JWT_SECRET_KEY")  # jwk secret for generate jwt
+    JWT_REFRESH_SECRET_KEY = env.str("JWT_REFRESH_SECRET_KEY")  # jkk for refresh token
 
     @classmethod
     def get_pg_url(cls) -> str:

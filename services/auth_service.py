@@ -5,20 +5,16 @@ from uuid import UUID, uuid4
 import inject
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from infrastructure.repositories.users_repository import UserRepository
-from models.auth import UserAuthIn, User, Tokens, UserInternal
+from models.auth import Tokens, User, UserAuthIn, UserInternal
 from settings import Settings
-from utils.exceptions.user_exception import UserNotFound, InvalidPassword, NotUniqLogin, NotUniqEmail
-
+from utils.exceptions.user_exception import InvalidPassword, NotUniqEmail, NotUniqLogin, UserNotFound
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth_schema = OAuth2PasswordBearer(
-    tokenUrl="/login",
-    scheme_name="JWT"
-)
+oauth_schema = OAuth2PasswordBearer(tokenUrl="/login", scheme_name="JWT")
 
 
 def get_hashed_password(password: str) -> str:
@@ -53,9 +49,9 @@ class AuthService:
         return encoded_jwt
 
     async def sign_up(self, user_auth: UserAuthIn) -> UserInternal:
-        check_uniq_login_email = asyncio.gather(self._users_repo.check_uniq_login(user_auth.login),
-                                                self._users_repo.check_uniq_email(user_auth.email)
-                                                )
+        check_uniq_login_email = asyncio.gather(
+            self._users_repo.check_uniq_login(user_auth.login), self._users_repo.check_uniq_email(user_auth.email)
+        )
         try:
             await check_uniq_login_email
         except (NotUniqLogin, NotUniqEmail) as e:
@@ -66,7 +62,7 @@ class AuthService:
             login=user_auth.login,
             email=user_auth.email,
             hashed_password=get_hashed_password(user_auth.password_1),
-            wallet_currency=None
+            wallet_currency=None,
         )
         user_from_db = await self._users_repo.create_user(user)
         return UserInternal.from_dict(user_from_db.to_dict())
@@ -78,7 +74,7 @@ class AuthService:
         else:
             access_token, refresh_token = await asyncio.gather(
                 self.create_access_token(user.user_id, Settings.ACCESS_TOKEN_EXPIRE_MINUTES),
-                self.create_refresh_token(user.user_id, Settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+                self.create_refresh_token(user.user_id, Settings.ACCESS_TOKEN_EXPIRE_MINUTES),
             )
         return Tokens(access_token, refresh_token)
 

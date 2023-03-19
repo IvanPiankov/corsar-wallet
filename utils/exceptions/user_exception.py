@@ -1,5 +1,6 @@
-from utils.custom_exception import CustomException
 from fastapi import status
+
+from utils.custom_exception import CustomException
 
 
 class UserNotFound(CustomException):
