@@ -3,6 +3,7 @@ version: "3.9"
 services:
   pg:
     image: postgres
+    user: postgres
     volumes:
       - db-data:/var/lib/postgresql/data/
     environment:
