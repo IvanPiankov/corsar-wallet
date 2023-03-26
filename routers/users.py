@@ -1,30 +1,52 @@
 import inject
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from fastapi.responses import ORJSONResponse
-from fastapi.security import OAuth2PasswordRequestForm
 
-from models.auth import Tokens, UserAuthIn, UserInternal
-from services.auth_service import AuthService, get_current_user
+from models.auth import UserInternal
+from models.enums import Currency
+from services.user_service import UserService, get_current_user
 
-auth_router = APIRouter(tags=["Auth User Route"])
-
-
-def new_auth_service() -> AuthService:
-    return inject.instance(AuthService)
+user_router = APIRouter(prefix="/user", tags=["User Router"])
 
 
-@auth_router.post("/sign-up", summary="Create new user", response_model=UserInternal)
-async def sign_up(user_auth_in: UserAuthIn, service: AuthService = Depends(new_auth_service)):
-    user_out = await service.sign_up(user_auth_in)
-    return ORJSONResponse(user_out.to_dict())
+def new_user_service() -> UserService:
+    return inject.instance(UserService)
 
 
-@auth_router.post("/login", summary="Login user", response_model=Tokens)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), service: AuthService = Depends(new_auth_service)):
-    tokens = await service.login(form_data.username, form_data.password)
-    return ORJSONResponse(tokens.to_dict())
-
-
-@auth_router.get("/get-me", summary="Get current user", response_model=UserInternal)
-async def login(current_user: UserInternal = Depends(get_current_user)):
+@user_router.get(
+    "",
+    summary="Get users",
+    response_model=UserInternal,
+    description="Need header with token: ```Authorization: Bearer {token}```",
+)
+async def get_user(current_user: UserInternal = Depends(get_current_user)):
     return ORJSONResponse(current_user.to_dict())
+
+
+@user_router.put(
+    "",
+    summary="Update user currency",
+    response_model=UserInternal,
+    description="Need header with token: ```Authorization: Bearer {token}```",
+)
+async def update_user_currency(
+    current_user: UserInternal = Depends(get_current_user),
+    wallet_currency: Currency = Body(..., embed=True, title="Currency",
+                                     description="Now work only this currency: `USD`, `RUB`, `EUR`"),
+    service: UserService = Depends(new_user_service),
+):
+    update_user_data = await service.update_user_currency(current_user, wallet_currency)
+    return ORJSONResponse(update_user_data.to_dict())
+
+
+@user_router.delete(
+    "",
+    summary="Delete current user",
+    response_model=None,
+    description="Need header with token: ```Authorization: Bearer {token}```",
+)
+async def delete_user(
+    current_user: UserInternal = Depends(get_current_user), service: UserService = Depends(new_user_service)
+):
+    await service.delete_user(current_user.user_id)
+    return ORJSONResponse({"status": "ok"})
