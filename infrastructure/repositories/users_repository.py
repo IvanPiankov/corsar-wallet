@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from infrastructure.repositories.db_models import users
 from models.auth import User, UserInternal
+from models.enums import Currency
 from utils.custom_exception import InternalException
 from utils.exceptions.user_exception import NotUniqEmail, NotUniqLogin, UserNotFound
 
@@ -80,3 +81,20 @@ class UserRepository:
         if item := row.first():
             return self._build_internal_user(item)
         raise InternalException
+
+    async def update_user_currency(self, user_id: UUID, wallet_currency: Currency) -> UserInternal:
+        update_query = (
+            users.update().values(wallet_currency=wallet_currency).where(users.c.user_id == user_id).returning(users)
+        )
+        async with self._db.connect() as conn:
+            row = await conn.execute(update_query)
+            await conn.commit()
+        if item := row.first():
+            return self._build_internal_user(item)
+        raise InternalException
+
+    async def delete_user(self, user_id: UUID) -> None:
+        delete_query = users.delete().where(users.c.user_id == user_id).returning()
+        async with self._db.connect() as conn:
+            await conn.execute(delete_query)
+            await conn.commit()

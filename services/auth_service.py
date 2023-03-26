@@ -2,19 +2,15 @@ import asyncio
 from datetime import datetime, timedelta
 from uuid import UUID, uuid4
 
-import inject
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jose import jwt
 from passlib.context import CryptContext
 
 from infrastructure.repositories.users_repository import UserRepository
 from models.auth import Tokens, User, UserAuthIn, UserInternal
 from settings import Settings
-from utils.exceptions.user_exception import InvalidPassword, NotUniqEmail, NotUniqLogin, UserNotFound
+from utils.exceptions.user_exception import InvalidPassword, NotUniqEmail, NotUniqLogin
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth_schema = OAuth2PasswordBearer(tokenUrl="/login", scheme_name="JWT")
 
 
 def get_hashed_password(password: str) -> str:
@@ -61,7 +57,7 @@ class AuthService:
             user_id=uuid4(),
             login=user_auth.login,
             email=user_auth.email,
-            hashed_password=get_hashed_password(user_auth.password_1)
+            hashed_password=get_hashed_password(user_auth.password_1),
         )
         user_from_db = await self._users_repo.create_user(user)
         return UserInternal.from_dict(user_from_db.to_dict())
@@ -76,15 +72,3 @@ class AuthService:
                 self.create_refresh_token(user.user_id, Settings.ACCESS_TOKEN_EXPIRE_MINUTES),
             )
         return Tokens(access_token, refresh_token)
-
-
-async def get_current_user(token: str = Depends(oauth_schema)) -> UserInternal:
-    try:
-        payload = jwt.decode(token, Settings.JWT_SECRET_KEY, algorithms=[Settings.ALGORITHM])
-        user_id = payload.get("sub")
-        if user_id is None:
-            raise UserNotFound
-        user_id = UUID(user_id)
-    except JWTError as e:
-        raise e
-    return await inject.instance(AuthService).get_user_by_id(user_id)
