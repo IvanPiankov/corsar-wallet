@@ -1,16 +1,15 @@
 from sqlalchemy import DECIMAL, Column, DateTime, ForeignKey, MetaData, String, Table, text
-from sqlalchemy.dialects.postgresql import ENUM, UUID
-
-from models.enums import AccountTypes
+from sqlalchemy.dialects.postgresql import UUID
 
 metadata = MetaData()
 
-wallets = Table(
-    "wallets",
+accounts = Table(
+    "accounts",
     metadata,
-    Column("wallet_id", UUID(as_uuid=True), nullable=False, primary_key=True),
+    Column("account_id", UUID(as_uuid=True), nullable=False, primary_key=True),
+    Column("name", String, nullable=False),
     Column("user_id", UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False),
-    Column("wallet_type", ENUM(AccountTypes, name="account_types"), nullable=False),
+    Column("account_type", String, nullable=False),
     Column("balance", DECIMAL, nullable=False),
     Column("currency", String, nullable=False),
     Column("created_at", DateTime(timezone=True), server_default=text("timezone('utc', now())"), nullable=False),

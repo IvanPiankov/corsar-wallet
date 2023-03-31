@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from jose import jwt
 from passlib.context import CryptContext
 
-from infrastructure.repositories.users_repository import UserRepository
+from infrastructure.repositories.users import UserRepository
 from models.auth import Tokens, User, UserAuthIn, UserInternal
 from settings import Settings
 from utils.exceptions.user_exception import InvalidPassword, NotUniqEmail, NotUniqLogin

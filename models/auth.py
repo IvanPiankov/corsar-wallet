@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from uuid import UUID
+
 from mashumaro import DataClassDictMixin
 from pydantic import BaseModel, EmailStr, validator
-from dataclasses import dataclass
 
 from models.enums import Currency
 

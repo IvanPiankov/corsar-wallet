@@ -1,5 +1,5 @@
 import inject
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Body, Depends
 from fastapi.responses import ORJSONResponse
 
 from models.auth import UserInternal
@@ -31,8 +31,9 @@ async def get_user(current_user: UserInternal = Depends(get_current_user)):
 )
 async def update_user_currency(
     current_user: UserInternal = Depends(get_current_user),
-    wallet_currency: Currency = Body(..., embed=True, title="Currency",
-                                     description="Now work only this currency: `USD`, `RUB`, `EUR`"),
+    wallet_currency: Currency = Body(
+        ..., embed=True, title="Currency", description="Now work only this currency: `USD`, `RUB`, `EUR`"
+    ),
     service: UserService = Depends(new_user_service),
 ):
     update_user_data = await service.update_user_currency(current_user, wallet_currency)

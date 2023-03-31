@@ -6,7 +6,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 
-from infrastructure.repositories.users_repository import UserRepository
+from infrastructure.repositories.users import UserRepository
 from models.auth import UserInternal
 from models.enums import Currency
 from settings import Settings

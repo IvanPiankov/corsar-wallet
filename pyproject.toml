@@ -8,7 +8,7 @@ packages = []
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.89.1"
+fastapi = "0.95.0"
 alembic = "^1.9.2"
 environs = "^9.5.0"
 inject = "^4.3.1"
