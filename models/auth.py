@@ -2,17 +2,16 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from mashumaro import DataClassDictMixin
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, Field, validator
 
 from models.enums import Currency
 
 
 class UserAuthIn(BaseModel):
-    # TODO: Create validator for filed
-    login: str
+    login: str = Field(min_length=1, max_length=20)
     email: EmailStr
-    password_1: str
-    password_2: str
+    password_1: str = Field(min_length=8)
+    password_2: str = Field(min_length=8)
 
     @validator("password_2")
     def passwords_match(cls, v, values, **kwargs):

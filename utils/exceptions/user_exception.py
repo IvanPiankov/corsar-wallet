@@ -1,25 +1,23 @@
 from fastapi import status
 
-from utils.custom_exception import CustomException
+# from utils.exception import CustomException
 
 
-class UserNotFound(CustomException):
+class UserNotFound(Exception):
     error_type: str = "UserNotFound"
-    status_code: int = status.HTTP_400_BAD_REQUEST
+    msg: str = "Not found user"
 
 
-class NotUniqLogin(CustomException):
+class NotUniqLogin(Exception):
     error_type: str = "NotUniqLogin"
-    status_code: int = status.HTTP_400_BAD_REQUEST
     msg: str = "User with this login exist"
 
 
-class NotUniqEmail(CustomException):
+class NotUniqEmail(Exception):
     error_type: str = "NotUniqEmail"
-    status_code: int = status.HTTP_400_BAD_REQUEST
     msg: str = "User with this email exist"
 
 
-class InvalidPassword(CustomException):
+class InvalidPassword(Exception):
     error_type: str = "InvalidPassword"
-    status_code: int = status.HTTP_400_BAD_REQUEST
+    msg: str = "Not valid user password"

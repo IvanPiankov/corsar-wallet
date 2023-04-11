@@ -4,14 +4,13 @@ from decimal import Decimal
 from uuid import UUID, uuid4
 
 from mashumaro import DataClassDictMixin, pass_through
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from models.enums import AccountTypes, Currency
 
 
 class AccountIn(BaseModel):
-    # TODO: Create validator for field
-    name: str
+    name: str = Field(min_length=1, max_length=20)
     account_type: AccountTypes
     balance: Decimal
     currency: Currency
@@ -58,7 +57,7 @@ class AccountOut(DataClassDictMixin):
     user_id: UUID
     name: str
     account_type: AccountTypes
-    balance: str
+    balance: Decimal
     currency: Currency
     created_at: datetime
 

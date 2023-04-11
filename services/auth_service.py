@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 from infrastructure.repositories.users import UserRepository
 from models.auth import Tokens, User, UserAuthIn, UserInternal
 from settings import Settings
-from utils.exceptions.user_exception import InvalidPassword, NotUniqEmail, NotUniqLogin
+from utils.exceptions.user_exception import InvalidPassword, NotUniqEmail, NotUniqLogin, UserNotFound
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -45,25 +45,31 @@ class AuthService:
         return encoded_jwt
 
     async def sign_up(self, user_auth: UserAuthIn) -> UserInternal:
-        check_uniq_login_email = asyncio.gather(
+        is_uniq_login, is_uniq_email = await asyncio.gather(
             self._users_repo.check_uniq_login(user_auth.login), self._users_repo.check_uniq_email(user_auth.email)
         )
-        try:
-            await check_uniq_login_email
-        except (NotUniqLogin, NotUniqEmail) as e:
-            check_uniq_login_email.cancel()
-            raise e
+
+        if not is_uniq_login:
+            raise NotUniqLogin
+        elif not is_uniq_email:
+            raise NotUniqEmail
+
         user = User(
             user_id=uuid4(),
             login=user_auth.login,
             email=user_auth.email,
             hashed_password=get_hashed_password(user_auth.password_1),
         )
+
         user_from_db = await self._users_repo.create_user(user)
+
         return UserInternal.from_dict(user_from_db.to_dict())
 
     async def login(self, username: str, password: str) -> Tokens:
         user = await self._users_repo.get_user_by_login(username)
+        if not user:
+            raise UserNotFound
+
         if not self.verify_password(password, user.hashed_password):
             raise InvalidPassword
         else:

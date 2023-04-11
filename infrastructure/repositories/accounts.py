@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from infrastructure.repositories.db_models import accounts
 from models.accounts import AccountInternal, AccountInternalUpdate
 from models.enums import AccountTypes, Currency
-from utils.custom_exception import InternalException
+from utils.exception import InternalException
 from utils.exceptions.user_exception import UserNotFound
 
 

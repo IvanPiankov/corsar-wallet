@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from infrastructure.repositories.db_models import users
 from models.auth import User, UserInternal
 from models.enums import Currency
-from utils.custom_exception import InternalException
+from utils.exception import InternalException
 from utils.exceptions.user_exception import NotUniqEmail, NotUniqLogin, UserNotFound
 
 
@@ -33,37 +33,27 @@ class UserRepository:
             wallet_currency=item.wallet_currency if item.wallet_currency else None,
         )
 
-    async def get_user_by_login(self, login: str) -> User:
+    async def get_user_by_login(self, login: str) -> User | None:
         select_query = users.select().where(users.c.login == login)
         async with self._db.connect() as conn:
             row = await conn.execute(select_query)
         if item := row.first():
             return self._build_user(item)
-        raise UserNotFound
+        return None
 
-    async def get_user_by_email(self, email: str) -> User:
-        select_query = users.select().where(users.c.email == email)
-        async with self._db.connect() as conn:
-            row = await conn.execute(select_query)
-        if item := row.first():
-            return self._build_user(item)
-        raise UserNotFound
-
-    async def check_uniq_login(self, login: str) -> None:
+    async def check_uniq_login(self, login: str) -> bool:
         select_query = users.select().where(users.c.login == login)
         async with self._db.connect() as conn:
             row = await conn.execute(select_query)
-        if row.first():
-            raise NotUniqLogin
-        return None
+        is_uniq_login = not bool(row.first())
+        return is_uniq_login
 
-    async def check_uniq_email(self, email: str) -> None:
+    async def check_uniq_email(self, email: str) -> bool:
         select_query = users.select().where(users.c.email == email)
         async with self._db.connect() as conn:
             row = await conn.execute(select_query)
-        if row.first():
-            raise NotUniqEmail
-        return None
+        is_uniq_email = not bool(row.first())
+        return is_uniq_email
 
     async def get_user_by_id(self, user_id: UUID) -> UserInternal:
         select_query = users.select().where(users.c.user_id == user_id)

@@ -1,3 +1,5 @@
+import logging
+from typing import Annotated
 from uuid import UUID
 
 import inject
@@ -10,7 +12,9 @@ from infrastructure.repositories.users import UserRepository
 from models.auth import UserInternal
 from models.enums import Currency
 from settings import Settings
+from utils.exception import WalletHttpException
 from utils.exceptions.user_exception import UserNotFound
+from utils.jwt_parser import parse_jwt
 
 oauth_schema = OAuth2PasswordBearer(tokenUrl="/auth/login", scheme_name="JWT")
 
@@ -31,11 +35,8 @@ class UserService:
 
 async def get_current_user(token: str = Depends(oauth_schema)) -> UserInternal:
     try:
-        payload = jwt.decode(token, Settings.JWT_SECRET_KEY, algorithms=[Settings.ALGORITHM])
-        user_id = payload.get("sub")
-        if user_id is None:
-            raise UserNotFound
-        user_id = UUID(user_id)
-    except JWTError as e:
-        raise e
-    return await inject.instance(UserService).get_user_by_id(user_id)
+        user_id = parse_jwt(token)
+        return await inject.instance(UserService).get_user_by_id(user_id)
+    except UserNotFound as e:
+        logging.warning(f"Token User Not Found - {e.error_type}")
+        raise WalletHttpException(msg=e.msg, error_type=e.error_type, status_code=401)
