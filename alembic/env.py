@@ -59,7 +59,7 @@ def run_migrations_online() -> None:
 
     """
     conf = config.get_section(config.config_ini_section)
-    conf["sqlalchemy.url"] = Settings.PG_MIGRATE_URL
+    conf["sqlalchemy.url"] = Settings.PG_MIGRATE_URL  # type: ignore
     connectable = engine_from_config(
         conf,
         prefix="sqlalchemy.",

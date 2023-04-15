@@ -1,4 +1,3 @@
-from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -9,7 +8,6 @@ from infrastructure.repositories.db_models import accounts
 from models.accounts import AccountInternal, AccountInternalUpdate
 from models.enums import AccountTypes, Currency
 from utils.exception import InternalException
-from utils.exceptions.user_exception import UserNotFound
 
 
 class AccountsRepository:
@@ -43,14 +41,13 @@ class AccountsRepository:
             return [self._build_account(item) for item in items]
         return []
 
-    async def get_account_by_id(self, user_id: UUID, account_id: UUID) -> AccountInternal:
+    async def get_account_by_id(self, user_id: UUID, account_id: UUID) -> AccountInternal | None:
         select_query = accounts.select().where((accounts.c.user_id == user_id) & (accounts.c.account_id == account_id))
         async with self._db.connect() as conn:
             row = await conn.execute(select_query)
         if item := row.first():
             return self._build_account(item)
-        # TODO: create extansion
-        raise UserNotFound
+        return None
 
     async def create_account(self, account: AccountInternal) -> AccountInternal:
         insert_query = accounts.insert().values(account.to_dict()).returning(accounts)

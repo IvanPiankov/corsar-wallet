@@ -7,7 +7,7 @@ from infrastructure.repositories.db_models import users
 from models.auth import User, UserInternal
 from models.enums import Currency
 from utils.exception import InternalException
-from utils.exceptions.user_exception import NotUniqEmail, NotUniqLogin, UserNotFound
+from utils.exceptions.user_exception import UserNotFound
 
 
 class UserRepository:

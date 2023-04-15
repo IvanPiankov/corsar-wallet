@@ -1,17 +1,13 @@
 import logging
-from typing import Annotated
 from uuid import UUID
 
 import inject
-import jwt
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError
 
 from infrastructure.repositories.users import UserRepository
 from models.auth import UserInternal
 from models.enums import Currency
-from settings import Settings
 from utils.exception import WalletHttpException
 from utils.exceptions.user_exception import UserNotFound
 from utils.jwt_parser import parse_jwt

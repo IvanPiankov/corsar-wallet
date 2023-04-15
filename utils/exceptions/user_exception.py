@@ -1,8 +1,3 @@
-from fastapi import status
-
-# from utils.exception import CustomException
-
-
 class UserNotFound(Exception):
     error_type: str = "UserNotFound"
     msg: str = "Not found user"
