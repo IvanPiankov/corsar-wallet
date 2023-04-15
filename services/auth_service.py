@@ -67,6 +67,7 @@ class AuthService:
 
     async def login(self, username: str, password: str) -> Tokens:
         user = await self._users_repo.get_user_by_login(username)
+        
         if not user:
             raise UserNotFound
 

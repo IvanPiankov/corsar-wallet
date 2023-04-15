@@ -15,4 +15,4 @@ class NotUniqEmail(Exception):
 
 class InvalidPassword(Exception):
     error_type: str = "InvalidPassword"
-    msg: str = "Not valid user password"
+    msg: str = "Not valid password/login"
