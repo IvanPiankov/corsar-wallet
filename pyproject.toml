@@ -7,7 +7,7 @@ readme = "README.md"
 packages = []
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "3.10.6"
 fastapi = "0.95.0"
 alembic = "^1.9.2"
 environs = "^9.5.0"
