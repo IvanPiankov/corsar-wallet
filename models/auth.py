@@ -25,7 +25,11 @@ class UserInternal(DataClassDictMixin):
     user_id: UUID
     login: str
     email: str
-    wallet_currency: str = Currency.USD
+    wallet_currency: str | None = Currency.USD
+
+    def __post_init__(self):
+        if not self.wallet_currency:
+            self.wallet_currency = Currency.USD
 
 
 @dataclass(kw_only=True)

@@ -1,4 +1,4 @@
-from sqlalchemy import DECIMAL, Column, DateTime, ForeignKey, MetaData, String, Table, text
+from sqlalchemy import DECIMAL, Column, DateTime, ForeignKey, Integer, MetaData, String, Table, text
 from sqlalchemy.dialects.postgresql import UUID
 
 metadata = MetaData()
@@ -24,4 +24,23 @@ users = Table(
     Column("email", String, nullable=False, unique=True),
     Column("hashed_password", String, nullable=False),
     Column("wallet_currency", String, nullable=True),
+)
+
+category = Table(
+    "category",
+    metadata,
+    Column("category_id", Integer, primary_key=True, autoincrement=True, nullable=False),
+    Column("name", String, nullable=False),
+    # TODO: Добавить возможность привязывать категорию к пользователю и сделать возможность шарить их
+    Column("icon", String, nullable=False),
+)
+
+subcategory = Table(
+    "subcategory",
+    metadata,
+    Column("subcategory_id", Integer, primary_key=True, autoincrement=True, nullable=False),
+    Column("category_id", Integer, ForeignKey("category.category_id"), nullable=False),
+    Column("name", String, nullable=False),
+    # TODO: Добавить возможность привязывать категорию к пользователю и сделать возможность шарить их
+    Column("icon", String, nullable=False),
 )
