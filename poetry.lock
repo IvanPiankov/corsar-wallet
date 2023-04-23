@@ -471,9 +471,6 @@ files = [
     {file = "jose-1.0.0.tar.gz", hash = "sha256:8436c3617cd94e1ba97828fbb1ce27c129f66c78fb855b4bb47e122b5f345fba"},
 ]
 
-[package.dependencies]
-pycrypto = ">=2.6"
-
 [[package]]
 name = "mako"
 version = "1.2.4"
