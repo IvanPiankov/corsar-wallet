@@ -20,9 +20,8 @@ services:
 
 
   corsar-wallet:
-    image: ivanpiankov/corsar-wallet:${COMMIT_TAG}
-    container_name: test_app
-    command: bash -c "poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    build: .
+    command: bash -c "poetry run alembic upgrade head && poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     env_file:
       - .env
     ports:

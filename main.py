@@ -40,13 +40,13 @@ app.add_middleware(
 )
 
 
-engine: AsyncEngine
+engine: AsyncEngine | None = None
 
 
 def config(binder: inject.Binder):
     global engine
 
-    engine = create_async_engine(Settings.get_pg_url())
+    # engine = create_async_engine(Settings.get_pg_url())
 
     user_repo = UserRepository(engine)
     accounts_repo = AccountsRepository(engine)
@@ -72,6 +72,6 @@ async def startup_event() -> None:
 
 @app.on_event("shutdown")
 async def shutdown_event() -> None:
-    global engine
+    # global engine
     logging.info("Shutting down...")
-    await engine.dispose()
+    # await engine.dispose()
