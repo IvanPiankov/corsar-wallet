@@ -40,7 +40,7 @@ app.add_middleware(
 )
 
 
-engine: AsyncEngine | None = None
+engine: AsyncEngine
 
 
 def config(binder: inject.Binder):
