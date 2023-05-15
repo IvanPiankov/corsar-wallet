@@ -7,9 +7,9 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=corsar-wallet-local-test
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${PG_DB}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready"]
       interval: 7s
@@ -21,12 +21,18 @@ services:
 
   corsar-wallet:
     image: ivanpiankov/corsar-wallet:${COMMIT_TAG}
-    container_name: test_app
-    command: bash -c "poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-    env_file:
-      - .env
+    container_name: corsar-wallet-backend
+    environment:
+      - ENABLE_MIGRATION=true
+      - PG_HOST=pg
+      - PG_PORT=5432
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_DB=${PG_DB}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_REFRESH_SECRET_KEY=${JWT_REFRESH_SECRET_KEY}
     ports:
-      - "8000:8000"
+      - "8090:8000"
     depends_on:
       pg:
         condition: service_healthy
