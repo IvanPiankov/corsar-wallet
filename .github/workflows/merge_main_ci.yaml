@@ -1,7 +1,9 @@
-name: lint and test
+name: Build and deploy to server
 
 on:
   push:
+    branches: [ "master", "main" ]
+    paths-ignore: [ "docs/**" ]
   workflow_dispatch:
 
 jobs:
@@ -131,8 +133,6 @@ jobs:
     name: Deploy
     runs-on: ubuntu-22.04
     needs: build
-    environment:
-      name: production
     steps:
       #----------------------------------------------
       # Copy docker compose production config
