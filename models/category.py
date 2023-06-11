@@ -9,8 +9,20 @@ class CategoryIn(BaseModel):
     icon: str
 
 
-@dataclass(kw_only=True)
+class SubcategoryIn(CategoryIn):
+    category_id: int
+
+
+@dataclass
 class CategoryInternal(DataClassDictMixin):
+    category_id: int
+    name: str
+    icon: str
+
+
+@dataclass
+class SubcategoryInternal(DataClassDictMixin):
+    subcategory_id: int
     category_id: int
     name: str
     icon: str

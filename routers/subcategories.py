@@ -7,72 +7,72 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 
 from models.auth import UserInternal
-from models.category import CategoryIn, CategoryInternal
-from services.categories import CategoriesService
+from models.category import SubcategoryIn, SubcategoryInternal
+from services.subcategories import SubcategoriesService
 from services.user_service import get_current_user
 from utils.exception import InternalException, WalletHttpException
 from utils.exceptions.category_exception import CategoryNotFound, NotUniqCatrgoryName
 from utils.status_code_message_mapper import ERROR_EXAMPLE_RESPONSE
 
-categories_router = APIRouter(prefix="/category", tags=["Category Router"])
+subcategories_router = APIRouter(prefix="/subcategory", tags=["Subcategory Router"])
 
 
-def new_category_service() -> CategoriesService:
-    return inject.instance(CategoriesService)
+def new_subcategory_service() -> SubcategoriesService:
+    return inject.instance(SubcategoriesService)
 
 
-NewCategoriesService = Annotated[CategoriesService, Depends(new_category_service)]
+NewSubcategoriesService = Annotated[SubcategoriesService, Depends(new_subcategory_service)]
 
 # TODO: Сделать нормальную проверку токена, а не использовать постоянно зависимость, чтобы что-то доставать.
 CurrentUser = Annotated[UserInternal, Depends(get_current_user)]
 
 
-@categories_router.get(
+@subcategories_router.get(
     "",
-    summary="Get categories",
-    response_model=list[CategoryInternal],
+    summary="Get subcategories",
+    response_model=list[SubcategoryInternal],
     responses={401: ERROR_EXAMPLE_RESPONSE},
     dependencies=[Depends(get_current_user)],
 )
-async def get_categories(service: NewCategoriesService):
+async def get_subcategories(service: NewSubcategoriesService):
     """
     Need header with token: ```Authorization: Bearer {token}```
     """
-    categories = await service.get_categories()
-    return jsonable_encoder(categories)
+    subcategories = await service.get_subcategories()
+    return jsonable_encoder(subcategories)
 
 
-@categories_router.post(
+@subcategories_router.post(
     "",
-    summary="Create category",
-    response_model=CategoryInternal,
+    summary="Create subcategory",
+    response_model=SubcategoryInternal,
     responses={401: ERROR_EXAMPLE_RESPONSE, 400: ERROR_EXAMPLE_RESPONSE},
     dependencies=[Depends(get_current_user)],
 )
-async def create_category(category_in: CategoryIn, service: NewCategoriesService):
+async def create_subcategory(subcategory_in: SubcategoryIn, service: NewSubcategoriesService):
     """
     Need header with token: ```Authorization: Bearer {token}```
     """
     try:
-        category = await service.create_category(category_in)
-        return jsonable_encoder(category)
+        subcategory = await service.create_subcategory(subcategory_in)
+        return jsonable_encoder(subcategory)
     except NotUniqCatrgoryName as e:
-        logging.warning(f"Not unique category name - {e.error_type}")
+        logging.warning(f"Not unique subcategory name - {e.error_type}")
         raise WalletHttpException(msg=e.msg, error_type=e.error_type, status_code=400)
 
 
-@categories_router.put(
-    "/{category_id}",
-    summary="Update category",
-    response_model=CategoryInternal,
+@subcategories_router.put(
+    "/{subcategory_id}",
+    summary="Update subcategory",
+    response_model=SubcategoryInternal,
     responses={401: ERROR_EXAMPLE_RESPONSE, 400: ERROR_EXAMPLE_RESPONSE, 500: ERROR_EXAMPLE_RESPONSE},
     dependencies=[Depends(get_current_user)],
 )
-async def update_user_currency(category_id: int, category_in: CategoryIn, service: NewCategoriesService):
+async def update_user_currency(subcategory_id: int, subcategory_in: SubcategoryIn, service: NewSubcategoriesService):
     """Need header with token: ```Authorization: Bearer {token}```"""
     try:
-        update_category = await service.update_category(category_id, category_in)
-        return jsonable_encoder(update_category)
+        update_subcategory = await service.update_subcategory(subcategory_id, subcategory_in)
+        return jsonable_encoder(update_subcategory)
     except (NotUniqCatrgoryName, CategoryNotFound) as e:
         logging.warning(f"category error - {e.error_type}")
         raise WalletHttpException(msg=e.msg, error_type=e.error_type, status_code=400)
@@ -81,9 +81,9 @@ async def update_user_currency(category_id: int, category_in: CategoryIn, servic
         raise WalletHttpException(msg=e.msg, error_type=e.error_type, status_code=500)
 
 
-@categories_router.delete(
-    "/{category_id}",
-    summary="Delete category",
+@subcategories_router.delete(
+    "/{subcategory_id}",
+    summary="Delete subcategory",
     response_model=None,
     responses={
         200: {
@@ -94,10 +94,10 @@ async def update_user_currency(category_id: int, category_in: CategoryIn, servic
     },
     dependencies=[Depends(get_current_user)],
 )
-async def delete_user(category_id: int, service: NewCategoriesService):
+async def delete_user(subcategory_id: int, service: NewSubcategoriesService):
     """Need header with token: ```Authorization: Bearer {token}```"""
     try:
-        await service.delete_category(category_id)
+        await service.delete_category(subcategory_id)
         return ORJSONResponse({"status": "ok"})
     except InternalException as e:
         logging.warning(f"internal - {e.error_type}")
